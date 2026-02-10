@@ -1,0 +1,45 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Inquiry {
+  id         String   @id @default(uuid())
+  name       String
+  email      String
+  company    String?
+  message    String
+  sourcePage String?  @map("source_page")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@map("inquiries")
+}
+
+model WaitlistUser {
+  id         String           @id @default(uuid())
+  email      String           @unique
+  name       String?
+  meta       String?          // SQLite does not support JSON type, storing as String
+  createdAt  DateTime         @default(now()) @map("created_at")
+  lastSeenAt DateTime?        @map("last_seen_at")
+  events     WaitlistEvent[]
+
+  @@map("waitlist_users")
+}
+
+model WaitlistEvent {
+  id        String        @id @default(uuid())
+  userId    String        @map("user_id")
+  event     String
+  ip        String?
+  userAgent String?       @map("user_agent")
+  referrer  String?
+  createdAt DateTime      @default(now()) @map("created_at")
+  user      WaitlistUser  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("waitlist_events")
+}

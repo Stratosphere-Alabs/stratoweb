@@ -1,0 +1,581 @@
+@import "tailwindcss";
+
+body {
+  background-color: #09090b;
+}
+
+/* LINE Seed JP webfonts */
+@font-face {
+  font-family: "LINESeedJP";
+  src: url("./assets/fonts/LINESeedJP_TTF_Th.ttf") format("truetype");
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "LINESeedJP";
+  src: url("./assets/fonts/LINESeedJP_TTF_Rg.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "LINESeedJP";
+  src: url("./assets/fonts/LINESeedJP_TTF_Bd.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "LINESeedJP";
+  src: url("./assets/fonts/LINESeedJP_TTF_Eb.ttf") format("truetype");
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ===========================
+   Link underline → arrow hover
+   Aaron Iker–style underline morph into arrow
+   ============================ */
+.sf-link-arrow {
+  --line: #3b82f6;
+  /* brighter blue line/arrow color */
+  --color: #0f172a;
+  /* slightly deeper text color */
+  --background-size: 100%;
+  --background-delay: 0.15s;
+  --stroke-dashoffset: 46;
+  --stroke-duration: 0.15s;
+  --stroke-easing: linear;
+  --stroke-delay: 0s;
+
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  text-decoration: none;
+  color: var(--color);
+  cursor: pointer;
+}
+
+.sf-link-arrow .sf-link-arrow-label {
+  position: relative;
+  padding-bottom: 2px;
+  background-image: linear-gradient(0deg, var(--line) 0%, var(--line) 100%);
+  background-position: 100% 100%;
+  background-repeat: no-repeat;
+  background-size: var(--background-size) 1px;
+  transition: background-size 0.2s linear var(--background-delay);
+  font-size: inherit;
+  line-height: 1.4;
+  transform: translateZ(0);
+}
+
+.sf-link-arrow .sf-link-arrow-icon {
+  display: inline-block;
+  width: 13px;
+  height: 20px;
+  vertical-align: top;
+}
+
+.sf-link-arrow .sf-link-arrow-icon polyline {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1px;
+  stroke: var(--line);
+  stroke-dasharray: 7.95 30;
+  stroke-dashoffset: var(--stroke-dashoffset);
+  transition:
+    stroke-dashoffset var(--stroke-duration) var(--stroke-easing) var(--stroke-delay);
+}
+
+.sf-link-arrow:hover {
+  --background-size: 0%;
+  --background-delay: 0s;
+  --stroke-dashoffset: 26;
+  --stroke-duration: 0.3s;
+  --stroke-easing: cubic-bezier(.3, 1.5, .5, 1);
+  --stroke-delay: 0.195s;
+}
+
+/* --- Stratoflow: lightweight mouse-follow fishnet background (Hero only) --- */
+.sf-mesh-bg {
+  position: relative;
+  width: 120%;
+  max-width: 900px;
+  height: 100%;
+  margin: 0 auto;
+  background:
+    radial-gradient(circle at 20% 0%, rgba(56, 189, 248, 0.16), transparent 60%),
+    radial-gradient(circle at 80% 20%, rgba(129, 140, 248, 0.14), transparent 65%),
+    radial-gradient(circle at 10% 80%, rgba(45, 212, 191, 0.12), transparent 65%),
+    radial-gradient(circle at 85% 90%, rgba(59, 130, 246, 0.18), transparent 68%);
+  background-color: #ffffff;
+}
+
+.sf-mesh-bg::before {
+  content: "";
+  position: absolute;
+  inset: -30%;
+  background-image:
+    linear-gradient(rgba(148, 163, 184, 0.55) 1px, transparent 0),
+    linear-gradient(90deg, rgba(148, 163, 184, 0.45) 1px, transparent 0);
+  background-size: 40px 40px;
+  opacity: 0.9;
+  transform-origin: center;
+  transform:
+    perspective(900px) rotateX(var(--mesh-rotate-x, 62deg)) rotateZ(-18deg) translateX(var(--mesh-translate-x, 0px)) translateY(var(--mesh-translate-y, -40px));
+  transition: transform 0.18s ease-out;
+  border-radius: 999px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sf-mesh-bg::before {
+    transition: none;
+  }
+}
+
+/* Stratoflow primary CTA button: default black, hover slide to light (反色) */
+.sf-cta-btn {
+  position: relative;
+  display: inline-block;
+  padding: 15px 25px;
+  border: none;
+  border-radius: 60px;
+  color: #f9fafb;
+  /* light text on dark base */
+  z-index: 1;
+  background-image: linear-gradient(90deg, #1d4ed8, #2563eb, #0ea5e9);
+  /* blue gradient */
+  font-weight: 1000;
+  font-size: 17px;
+  transition: all 250ms;
+  overflow: hidden;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.sf-cta-btn::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 0;
+  border-radius: 25px;
+  background-color: #feb01f;
+  /* deep blue overlay for inverted hover */
+  z-index: -1;
+  -webkit-box-shadow: 4px 8px 19px -3px rgba(0, 0, 0, 0.35);
+  box-shadow: 4px 8px 19px -3px rgba(0, 0, 0, 0.35);
+  transition: all 250ms;
+}
+
+.sf-cta-btn:hover {
+  color: #ffffff;
+  /* dark text when overlay (light) slides in */
+}
+
+.sf-cta-btn:hover::before {
+  width: 100%;
+}
+
+/* Stratoflow CTA skin only: same visual effect as sf-cta-btn, without sizing */
+.sf-cta-skin {
+  position: relative;
+  display: inline-block;
+  border: none;
+  color: #f9fafb;
+  /* light text on dark base */
+  z-index: 1;
+  background-image: linear-gradient(90deg, #1d4ed8, #2563eb, #0ea5e9);
+  /* blue gradient */
+  font-weight: 700;
+  transition: all 250ms;
+  overflow: hidden;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.sf-cta-skin::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 0;
+  border-radius: inherit;
+  background-color: #feb01f;
+  z-index: -1;
+  -webkit-box-shadow: 4px 8px 19px -3px rgba(0, 0, 0, 0.35);
+  box-shadow: 4px 8px 19px -3px rgba(0, 0, 0, 0.35);
+  transition: all 250ms;
+}
+
+.sf-cta-skin:hover {
+  color: #ffffff;
+}
+
+.sf-cta-skin:hover::before {
+  width: 100%;
+}
+
+/* ===========================
+   導入企業ロゴ用 ダブルスクロールマルチ
+   ============================ */
+.sf-logo-marquee {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  /* 端をフェードさせて「途中で切れていない」印象にする */
+  mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+}
+
+.sf-logo-track {
+  display: inline-flex;
+  align-items: center;
+  gap: 48px;
+  animation: sf-marquee-left 28s linear infinite;
+  will-change: transform;
+}
+
+.sf-logo-track--reverse {
+  animation-name: sf-marquee-right;
+}
+
+.sf-logo-logo {
+  height: 32px;
+  min-width: 88px;
+  padding-inline: 16px;
+  border-radius: 999px;
+  background-color: #f1f5f9;
+  /* slate-100-ish placeholder */
+  border: 1px solid #e2e8f0;
+  /* slate-200-ish */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  color: #94a3b8;
+  /* slate-400-ish */
+  white-space: nowrap;
+}
+
+@keyframes sf-marquee-left {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes sf-marquee-right {
+  from {
+    transform: translateX(-50%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* ===========================
+   Loading Screen Animations
+   ============================ */
+@keyframes loading-progress {
+  0% {
+    width: 0%;
+    left: 0;
+  }
+
+  50% {
+    width: 60%;
+    left: 20%;
+  }
+
+  100% {
+    width: 0%;
+    left: 100%;
+  }
+}
+
+.animate-loading-progress {
+  animation: loading-progress 1.5s ease-in-out infinite;
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 2s ease-in-out infinite;
+}
+
+@keyframes pulse-slow {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* ===========================
+   Partner Logos Marquee Animation
+   ============================ */
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 25s linear infinite;
+}
+
+/* ===========================
+   Stats Section Entrance Animation
+   ============================ */
+@keyframes fade-in-up {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.8s ease-out forwards;
+  animation-delay: var(--delay, 0ms);
+}
+
+/* ===========================
+   Stats Card Scan Line Animation
+   ============================ */
+@keyframes scan-line {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+
+  10% {
+    opacity: 1;
+  }
+
+  90% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(calc(100vh));
+    opacity: 0;
+  }
+}
+
+.animate-scan-line>div {
+  animation: scan-line 1.5s ease-out forwards;
+}
+
+/* Glitch text effect for numbers */
+@keyframes glitch {
+
+  0%,
+  100% {
+    transform: translate(0);
+    opacity: 1;
+  }
+
+  20% {
+    transform: translate(-2px, 2px);
+  }
+
+  40% {
+    transform: translate(2px, -2px);
+  }
+
+  60% {
+    transform: translate(-1px, 1px);
+  }
+
+  80% {
+    transform: translate(1px, -1px);
+  }
+}
+
+.animate-glitch {
+  animation: glitch 0.3s ease-in-out;
+}
+
+/* ===========================
+   Modal Entrance Animation
+   ============================ */
+@keyframes modal-enter {
+  0% {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.animate-modal-enter {
+  animation: modal-enter 0.3s ease-out forwards;
+}
+
+@keyframes menu-slide-down {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-menu-slide-down {
+  animation: menu-slide-down 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* --- Stratoflow: Staggered Fade-Up Entrance --- */
+@keyframes sf-fade-up {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-sf-fade-up {
+  opacity: 0;
+  animation: sf-fade-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* --- Stratoflow: Pop Effect --- */
+@keyframes sf-pop {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.1);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+.animate-sf-pop {
+  animation: sf-pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* --- Stratoflow: Slide-Up Fade --- */
+@keyframes sf-slide-up-fade {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-sf-slide-up-fade {
+  opacity: 0;
+  animation: sf-slide-up-fade 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-delay: var(--delay, 0ms);
+}
+
+/* --- Stratoflow: Bounce In Effect --- */
+@keyframes sf-bounce-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.9) translateY(20px);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.02) translateY(-5px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.animate-sf-bounce-in {
+  animation: sf-bounce-in 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Scroll reveal text effect (wipe-in) */
+@keyframes wipe-in {
+  0% {
+    clip-path: inset(0 100% 0 0);
+  }
+
+  100% {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+.animate-wipe-in {
+  animation: wipe-in 1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Hero API glowing style */
+.hero-api {
+  color: rgb(0, 176, 240);
+  /* bright tech blue (rgb) */
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  font-weight: 1000;
+  /* weaker layered text-shadow for subtle glow */
+  text-shadow:
+    0 0 4px rgba(0, 103, 166, 0.65),
+    0 0 10px rgba(57, 178, 255, 0.35),
+    0 4px 18px rgba(0, 0, 0, 0.35);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.hero-api-glow-pulse {
+  animation: hero-glow 3.6s ease-in-out infinite;
+}
+
+@keyframes hero-glow {
+
+  0%,
+  100% {
+    text-shadow: 0 0 3px rgba(57, 178, 255, 0.6), 0 0 8px rgba(57, 178, 255, 0.28);
+  }
+
+  50% {
+    text-shadow: 0 0 6px rgba(57, 178, 255, 0.8), 0 0 12px rgba(57, 178, 255, 0.4);
+  }
+}
