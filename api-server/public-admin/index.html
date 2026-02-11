@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Stratoflow</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #f1f5f9;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #334155;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            background: transparent;
+            border: none;
+            color: #94a3b8;
+            cursor: pointer;
+            font-size: 16px;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .tab:hover {
+            color: #e2e8f0;
+        }
+
+        .tab.active {
+            color: #60a5fa;
+            border-bottom-color: #60a5fa;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .controls {
+            background: #1e293b;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        input[type="text"] {
+            padding: 10px 15px;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            color: #e2e8f0;
+            font-size: 14px;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #60a5fa;
+        }
+
+        button {
+            padding: 10px 20px;
+            background: #3b82f6;
+            border: none;
+            border-radius: 6px;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background: #2563eb;
+        }
+
+        button.secondary {
+            background: #475569;
+        }
+
+        button.secondary:hover {
+            background: #64748b;
+        }
+
+        .pagination {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .pagination-info {
+            color: #94a3b8;
+            font-size: 14px;
+        }
+
+        table {
+            width: 100%;
+            background: #1e293b;
+            border-radius: 8px;
+            overflow: hidden;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: #334155;
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #f1f5f9;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 15px;
+            border-top: 1px solid #334155;
+            font-size: 14px;
+            color: #cbd5e1;
+        }
+
+        tbody tr:hover {
+            background: #293548;
+        }
+
+        .message-cell {
+            max-width: 400px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #94a3b8;
+        }
+
+        .error {
+            background: #7f1d1d;
+            color: #fecaca;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+
+        .email-cell {
+            color: #60a5fa;
+        }
+
+        .timestamp-cell {
+            color: #94a3b8;
+            font-size: 13px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>📊 Admin Dashboard</h1>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('inquiries')">Inquiries</button>
+            <button class="tab" onclick="switchTab('waitlist-users')">Waitlist Users</button>
+            <button class="tab" onclick="switchTab('waitlist-events')">Waitlist Events</button>
+        </div>
+
+        <!-- Inquiries Tab -->
+        <div id="inquiries" class="tab-content active">
+            <div class="controls">
+                <input type="text" id="inquiries-search" placeholder="Search by email or name...">
+                <button onclick="searchData('inquiries')">Search</button>
+                <button class="secondary" onclick="resetSearch('inquiries')">Reset</button>
+                <div class="pagination">
+                    <button onclick="prevPage('inquiries')" id="inquiries-prev">Previous</button>
+                    <span class="pagination-info" id="inquiries-info">-</span>
+                    <button onclick="nextPage('inquiries')" id="inquiries-next">Next</button>
+                </div>
+                <button onclick="exportCsv('inquiries')">📥 Download CSV</button>
+            </div>
+            <div id="inquiries-error" class="error" style="display:none;"></div>
+            <div id="inquiries-table"></div>
+        </div>
+
+        <!-- Waitlist Users Tab -->
+        <div id="waitlist-users" class="tab-content">
+            <div class="controls">
+                <input type="text" id="waitlist-users-search" placeholder="Search by email or name...">
+                <button onclick="searchData('waitlist-users')">Search</button>
+                <button class="secondary" onclick="resetSearch('waitlist-users')">Reset</button>
+                <div class="pagination">
+                    <button onclick="prevPage('waitlist-users')" id="waitlist-users-prev">Previous</button>
+                    <span class="pagination-info" id="waitlist-users-info">-</span>
+                    <button onclick="nextPage('waitlist-users')" id="waitlist-users-next">Next</button>
+                </div>
+                <button onclick="exportCsv('waitlist-users')">📥 Download CSV</button>
+            </div>
+            <div id="waitlist-users-error" class="error" style="display:none;"></div>
+            <div id="waitlist-users-table"></div>
+        </div>
+
+        <!-- Waitlist Events Tab -->
+        <div id="waitlist-events" class="tab-content">
+            <div class="controls">
+                <input type="text" id="waitlist-events-search" placeholder="Search by user email...">
+                <button onclick="searchData('waitlist-events')">Search</button>
+                <button class="secondary" onclick="resetSearch('waitlist-events')">Reset</button>
+                <div class="pagination">
+                    <button onclick="prevPage('waitlist-events')" id="waitlist-events-prev">Previous</button>
+                    <span class="pagination-info" id="waitlist-events-info">-</span>
+                    <button onclick="nextPage('waitlist-events')" id="waitlist-events-next">Next</button>
+                </div>
+                <button onclick="exportCsv('waitlist-events')">📥 Download CSV</button>
+            </div>
+            <div id="waitlist-events-error" class="error" style="display:none;"></div>
+            <div id="waitlist-events-table"></div>
+        </div>
+    </div>
+
+    <script>
+        const state = {
+            'inquiries': { offset: 0, limit: 50, q: '', total: 0 },
+            'waitlist-users': { offset: 0, limit: 50, q: '', total: 0 },
+            'waitlist-events': { offset: 0, limit: 50, q: '', total: 0 }
+        };
+
+        // HTML escape function to prevent XSS
+        function escape(html) {
+            const div = document.createElement('div');
+            div.textContent = html;
+            return div.innerHTML;
+        }
+
+        // Switch between tabs
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+
+            loadData(tabName);
+        }
+
+        // Load data for a specific resource
+        async function loadData(resource) {
+            const { offset, limit, q } = state[resource];
+            const tableDiv = document.getElementById(`${resource}-table`);
+            const errorDiv = document.getElementById(`${resource}-error`);
+
+            tableDiv.innerHTML = '<div class="loading">Loading...</div>';
+            errorDiv.style.display = 'none';
+
+            try {
+                let url = `/admin-api/${resource}?limit=${limit}&offset=${offset}`;
+                if (q) url += `&q=${encodeURIComponent(q)}`;
+
+                const response = await fetch(url);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+                const data = await response.json();
+                state[resource].total = data.total;
+
+                renderTable(resource, data.items);
+                updatePagination(resource);
+            } catch (error) {
+                errorDiv.textContent = `Error loading data: ${error.message}`;
+                errorDiv.style.display = 'block';
+                tableDiv.innerHTML = '';
+            }
+        }
+
+        // Render table based on resource type
+        function renderTable(resource, items) {
+            const tableDiv = document.getElementById(`${resource}-table`);
+
+            if (items.length === 0) {
+                tableDiv.innerHTML = '<div class="loading">No data found</div>';
+                return;
+            }
+
+            let html = '<table><thead><tr>';
+
+            if (resource === 'inquiries') {
+                html += '<th>ID</th><th>Name</th><th>Email</th><th>Company</th><th>Message</th><th>Source Page</th><th>Created At</th>';
+            } else if (resource === 'waitlist-users') {
+                html += '<th>ID</th><th>Email</th><th>Name</th><th>Meta</th><th>Last Seen</th><th>Created At</th>';
+            } else if (resource === 'waitlist-events') {
+                html += '<th>ID</th><th>Event</th><th>User Email</th><th>IP</th><th>User Agent</th><th>Referrer</th><th>Created At</th>';
+            }
+
+            html += '</tr></thead><tbody>';
+
+            items.forEach(item => {
+                html += '<tr>';
+
+                if (resource === 'inquiries') {
+                    html += `<td>${escape(item.id.substring(0, 8))}</td>`;
+                    html += `<td>${escape(item.name)}</td>`;
+                    html += `<td class="email-cell">${escape(item.email)}</td>`;
+                    html += `<td>${escape(item.company || '-')}</td>`;
+                    html += `<td class="message-cell" title="${escape(item.message)}">${escape(item.message)}</td>`;
+                    html += `<td>${escape(item.source_page || '-')}</td>`;
+                    html += `<td class="timestamp-cell">${new Date(item.created_at).toLocaleString()}</td>`;
+                } else if (resource === 'waitlist-users') {
+                    html += `<td>${escape(item.id.substring(0, 8))}</td>`;
+                    html += `<td class="email-cell">${escape(item.email)}</td>`;
+                    html += `<td>${escape(item.name || '-')}</td>`;
+                    html += `<td>${escape(item.meta || '-')}</td>`;
+                    html += `<td class="timestamp-cell">${item.last_seen_at ? new Date(item.last_seen_at).toLocaleString() : '-'}</td>`;
+                    html += `<td class="timestamp-cell">${new Date(item.created_at).toLocaleString()}</td>`;
+                } else if (resource === 'waitlist-events') {
+                    html += `<td>${escape(item.id.substring(0, 8))}</td>`;
+                    html += `<td>${escape(item.event)}</td>`;
+                    html += `<td class="email-cell">${escape(item.user_email)}</td>`;
+                    html += `<td>${escape(item.ip || '-')}</td>`;
+                    html += `<td class="message-cell" title="${escape(item.user_agent || '')}">${escape(item.user_agent || '-')}</td>`;
+                    html += `<td>${escape(item.referrer || '-')}</td>`;
+                    html += `<td class="timestamp-cell">${new Date(item.created_at).toLocaleString()}</td>`;
+                }
+
+                html += '</tr>';
+            });
+
+            html += '</tbody></table>';
+            tableDiv.innerHTML = html;
+        }
+
+        // Update pagination info and button states
+        function updatePagination(resource) {
+            const { offset, limit, total } = state[resource];
+            const infoSpan = document.getElementById(`${resource}-info`);
+            const prevBtn = document.getElementById(`${resource}-prev`);
+            const nextBtn = document.getElementById(`${resource}-next`);
+
+            const start = total === 0 ? 0 : offset + 1;
+            const end = Math.min(offset + limit, total);
+            infoSpan.textContent = `${start}-${end} of ${total}`;
+
+            prevBtn.disabled = offset === 0;
+            nextBtn.disabled = offset + limit >= total;
+        }
+
+        // Pagination handlers
+        function prevPage(resource) {
+            const { offset, limit } = state[resource];
+            if (offset > 0) {
+                state[resource].offset = Math.max(0, offset - limit);
+                loadData(resource);
+            }
+        }
+
+        function nextPage(resource) {
+            const { offset, limit, total } = state[resource];
+            if (offset + limit < total) {
+                state[resource].offset = offset + limit;
+                loadData(resource);
+            }
+        }
+
+        // Search handlers
+        function searchData(resource) {
+            const searchInput = document.getElementById(`${resource}-search`);
+            state[resource].q = searchInput.value.trim();
+            state[resource].offset = 0;
+            loadData(resource);
+        }
+
+        function resetSearch(resource) {
+            const searchInput = document.getElementById(`${resource}-search`);
+            searchInput.value = '';
+            state[resource].q = '';
+            state[resource].offset = 0;
+            loadData(resource);
+        }
+
+        // Export CSV
+        function exportCsv(resource) {
+            window.location.href = `/admin-api/export/${resource}.csv`;
+        }
+
+        // Allow search on Enter key
+        document.querySelectorAll('input[type="text"]').forEach(input => {
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    const resource = e.target.id.replace('-search', '');
+                    searchData(resource);
+                }
+            });
+        });
+
+        // Load initial data
+        loadData('inquiries');
+    </script>
+</body>
+
+</html>

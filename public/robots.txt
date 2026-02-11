@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+
+# Disallow admin and console pages from indexing
+Disallow: /console/
+Disallow: /login
+Disallow: /waitlist
+
+# Sitemap location
+Sitemap: https://stratoflow.com/sitemap.xml
+
+# Crawl-delay (optional, adjust if needed)
+Crawl-delay: 1
